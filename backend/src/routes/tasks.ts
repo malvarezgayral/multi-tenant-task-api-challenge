@@ -47,20 +47,36 @@ tasksRouter.post(
     const body = c.req.valid("json");
     const db = createDb(c.env.DATABASE_URL);
 
-    // tenantId is forced from the auth context — clients cannot override it
-    const [created] = await db
-      .insert(tasks)
-      .values({
-        title: body.title,
-        status: body.status,
-        tenantId, // always from auth context, never from request body
-      })
-      .returning();
+    try {
+      // tenantId is forced from the auth context — clients cannot override it
+      const [created] = await db
+        .insert(tasks)
+        .values({
+          title: body.title,
+          status: body.status,
+          tenantId, // always from auth context, never from request body
+        })
+        .returning();
 
-    console.log(
-      JSON.stringify({ message: "task_created", tenantId, taskId: created?.id })
-    );
-    return c.json(created, 201);
+      if (!created) {
+        // .returning() returned empty — unexpected but handle explicitly
+        console.error(
+          JSON.stringify({ message: "task_create_empty_return", tenantId })
+        );
+        return c.json({ error: "Task could not be created" }, 500);
+      }
+
+      console.log(
+        JSON.stringify({ message: "task_created", tenantId, taskId: created.id })
+      );
+      return c.json(created, 201);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      console.error(
+        JSON.stringify({ message: "task_create_error", tenantId, error: message })
+      );
+      return c.json({ error: "Failed to create task" }, 500);
+    }
   }
 );
 
