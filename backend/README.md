@@ -51,6 +51,8 @@ Copy `.env.example` to `.dev.vars` for local development:
 cp .env.example .dev.vars
 ```
 
+**Note**: in this case we commit the `.dev.vars` file to git, but in a real production environment we would not commit it because of security reasons. We only allow it in this case for the challenge purposes to make it easier to run locally with the right environment variables.
+
 > **Wrangler** reads `.dev.vars` automatically during `wrangler dev`.  
 > For production, set secrets with `wrangler secret put <SECRET_NAME>`.
 
@@ -97,6 +99,19 @@ npm run dev
 ```
 
 ---
+
+## Setup for the challenge reviewers
+
+### 1. Clone the repository
+
+### 2. Install dependencies
+
+### 3. Configure environment variables
+
+### 4. Run database migration
+
+### 5. Start dev server
+
 
 ## API Reference
 
