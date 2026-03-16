@@ -1,0 +1,27 @@
+{
+  "name": "multitenant-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:generate": "node --env-file=.dev.vars node_modules/.bin/drizzle-kit generate",
+    "db:migrate": "node --env-file=.dev.vars node_modules/.bin/drizzle-kit migrate",
+    "db:studio": "node --env-file=.dev.vars node_modules/.bin/drizzle-kit studio",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.4.3",
+    "@neondatabase/serverless": "^0.10.4",
+    "drizzle-orm": "^0.41.0",
+    "hono": "^4.7.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "@types/node": "^22.13.10",
+    "drizzle-kit": "^0.30.4",
+    "typescript": "^5.8.2",
+    "wrangler": "^4.4.0"
+  }
+}

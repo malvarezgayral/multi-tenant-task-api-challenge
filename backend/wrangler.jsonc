@@ -1,0 +1,27 @@
+{
+  // Cloudflare Workers configuration
+  // Secrets (DATABASE_URL, TENANT_A_TOKEN, TENANT_B_TOKEN) are set via:
+  //   wrangler secret put <SECRET_NAME>
+  // Never put secret values in this file.
+  "name": "multitenant-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-15",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Non-secret runtime config
+  "vars": {
+    "ENVIRONMENT": "development",
+    // In-memory rate limit: max requests per window (per tenant)
+    "RATE_LIMIT_MAX": "10",
+    // Window duration in milliseconds
+    "RATE_LIMIT_WINDOW_MS": "60000"
+  },
+
+  // Workers Logs & Traces for observability
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
+  }
+}

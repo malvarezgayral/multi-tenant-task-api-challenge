@@ -1,5 +1,7 @@
 # Discussion on how to solve the challenge
 
+IMPORTANT: this file is a suggestion of how to solve the challenge, not the final solution. The final solution should be in the code files, and the agent must discuss with this file not take it as the ultimate truth.
+
 ## Visión general de la arquitectura
 
 El sistema tiene tres piezas bien separadas:
