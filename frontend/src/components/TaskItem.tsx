@@ -7,15 +7,19 @@ interface Props {
   tenant: TenantId
 }
 
-const STATUS_STYLES: Record<Task['status'], { bg: string; color: string; label: string }> = {
-  pending: { bg: 'rgba(99,102,241,0.12)', color: '#818cf8', label: 'Pending' },
-  done: { bg: 'rgba(34,197,94,0.12)', color: '#4ade80', label: 'Done' },
+const STATUS_CLASSES: Record<Task['status'], string> = {
+  pending: 'bg-accent-muted text-accent',
+  done: 'bg-success-muted text-success',
+}
+
+const STATUS_LABELS: Record<Task['status'], string> = {
+  pending: 'Pending',
+  done: 'Done',
 }
 
 export function TaskItem({ task, tenant }: Props) {
   const [showConfirm, setShowConfirm] = useState(false)
   const queryClient = useQueryClient()
-  const statusStyle = STATUS_STYLES[task.status]
 
   const mutation = useMutation({
     mutationFn: () => deleteTask(tenant, task.id),
@@ -38,200 +42,93 @@ export function TaskItem({ task, tenant }: Props) {
 
   return (
     <>
-      {/* ── Task row ─────────────────────────────────────────────────────── */}
+      {/* ── Task row ─────────────────────────────────────────────────── */}
       <div
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-md)',
-          padding: '14px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '14px',
-          transition: 'border-color 0.15s ease',
-          opacity: mutation.isPending ? 0.5 : 1,
-        }}
-        onMouseEnter={(e) =>
-          ((e.currentTarget as HTMLDivElement).style.borderColor =
-            'var(--color-border-hover)')
-        }
-        onMouseLeave={(e) =>
-          ((e.currentTarget as HTMLDivElement).style.borderColor =
-            'var(--color-border)')
-        }
+        className={[
+          'bg-surface border border-border hover:border-border-hover',
+          'rounded-md px-[18px] py-3.5 flex items-center gap-3.5',
+          'transition-colors duration-150',
+          mutation.isPending ? 'opacity-50' : '',
+        ].join(' ')}
       >
         {/* Status badge */}
         <span
-          style={{
-            flexShrink: 0,
-            padding: '3px 10px',
-            borderRadius: '99px',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            backgroundColor: statusStyle.bg,
-            color: statusStyle.color,
-          }}
+          className={[
+            'shrink-0 px-2.5 py-[3px] rounded-full text-[11px] font-semibold tracking-[0.04em]',
+            STATUS_CLASSES[task.status],
+          ].join(' ')}
         >
-          {statusStyle.label}
+          {STATUS_LABELS[task.status]}
         </span>
 
         {/* Title */}
         <span
-          style={{
-            flex: 1,
-            fontSize: '14px',
-            color:
-              task.status === 'done'
-                ? 'var(--color-text-muted)'
-                : 'var(--color-text-primary)',
-            textDecoration: task.status === 'done' ? 'line-through' : 'none',
-            wordBreak: 'break-word',
-          }}
+          className={[
+            'flex-1 text-sm break-words',
+            task.status === 'done'
+              ? 'text-muted line-through'
+              : 'text-primary',
+          ].join(' ')}
         >
           {task.title}
         </span>
 
         {/* Date */}
-        <span style={{ flexShrink: 0, fontSize: '12px', color: 'var(--color-text-muted)' }}>
-          {date}
-        </span>
+        <span className="shrink-0 text-xs text-muted">{date}</span>
 
         {/* Delete trigger */}
         <button
           onClick={() => setShowConfirm(true)}
           disabled={mutation.isPending}
           title="Delete task"
-          style={{
-            flexShrink: 0,
-            width: '30px',
-            height: '30px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid transparent',
-            borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'transparent',
-            color: 'var(--color-text-muted)',
-            cursor: mutation.isPending ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            transition: 'all 0.15s ease',
-          }}
-          onMouseEnter={(e) => {
-            if (!mutation.isPending) {
-              ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                'var(--color-danger-muted)'
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor =
-                'var(--color-danger)'
-              ;(e.currentTarget as HTMLButtonElement).style.color =
-                'var(--color-danger)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'
-            ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'transparent'
-            ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-text-muted)'
-          }}
+          className={[
+            'shrink-0 w-[30px] h-[30px] flex items-center justify-center',
+            'border border-transparent rounded-sm text-base',
+            'text-muted cursor-pointer transition-all duration-150',
+            'hover:bg-danger-muted hover:border-danger hover:text-danger',
+            'disabled:cursor-not-allowed disabled:pointer-events-none',
+          ].join(' ')}
         >
           {mutation.isPending ? '…' : '×'}
         </button>
       </div>
 
-      {/* ── Confirmation modal ───────────────────────────────────────────── */}
+      {/* ── Confirmation modal ───────────────────────────────────────── */}
       {showConfirm && (
         <div
           onClick={() => setShowConfirm(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(3px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 50,
-          }}
+          className="fixed inset-0 bg-black/55 backdrop-blur-sm flex items-center justify-center z-50"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'var(--color-surface-elevated)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '28px 32px',
-              maxWidth: '360px',
-              width: '90%',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            }}
+            className="bg-surface-elevated border border-border rounded-lg p-8 max-w-sm w-[90%] shadow-2xl"
           >
-            <h3
-              style={{
-                margin: '0 0 8px',
-                fontSize: '16px',
-                fontWeight: 700,
-                color: 'var(--color-text-primary)',
-              }}
-            >
+            <h3 className="m-0 mb-2 text-base font-bold text-primary">
               Delete task?
             </h3>
-            <p
-              style={{
-                margin: '0 0 24px',
-                fontSize: '14px',
-                color: 'var(--color-text-secondary)',
-                lineHeight: 1.5,
-              }}
-            >
-              "<strong style={{ color: 'var(--color-text-primary)' }}>{task.title}</strong>"
-              will be permanently deleted.
+            <p className="m-0 mb-6 text-sm text-secondary leading-relaxed">
+              "
+              <strong className="text-primary">{task.title}</strong>
+              " will be permanently deleted.
             </p>
 
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+            <div className="flex gap-2.5 justify-end">
               <button
                 onClick={() => setShowConfirm(false)}
-                style={{
-                  padding: '9px 18px',
-                  backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  transition: 'border-color 0.15s ease',
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLButtonElement).style.borderColor =
-                    'var(--color-border-hover)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLButtonElement).style.borderColor =
-                    'var(--color-border)')
-                }
+                className={[
+                  'px-4 py-2 rounded-md text-sm font-medium cursor-pointer',
+                  'bg-surface border border-border hover:border-border-hover',
+                  'text-secondary transition-colors duration-150',
+                ].join(' ')}
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                style={{
-                  padding: '9px 18px',
-                  backgroundColor: 'var(--color-danger)',
-                  border: '1px solid transparent',
-                  borderRadius: 'var(--radius-md)',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease',
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                    'var(--color-danger-hover)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                    'var(--color-danger)')
-                }
+                className={[
+                  'px-4 py-2 rounded-md text-sm font-semibold cursor-pointer text-white',
+                  'bg-danger hover:bg-danger-hover transition-colors duration-150',
+                ].join(' ')}
               >
                 Delete
               </button>

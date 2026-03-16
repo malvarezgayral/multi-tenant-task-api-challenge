@@ -14,7 +14,7 @@ export function TaskList({ tenant }: Props) {
 
   if (isLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--color-text-muted)', fontSize: '14px' }}>
+      <div className="text-center py-12 text-muted text-sm">
         Loading tasks…
       </div>
     )
@@ -22,16 +22,7 @@ export function TaskList({ tenant }: Props) {
 
   if (isError) {
     return (
-      <div
-        style={{
-          backgroundColor: 'var(--color-danger-muted)',
-          border: '1px solid var(--color-danger)',
-          borderRadius: 'var(--radius-md)',
-          padding: '16px 20px',
-          color: 'var(--color-danger)',
-          fontSize: '14px',
-        }}
-      >
+      <div className="bg-danger-muted border border-danger rounded-md px-5 py-4 text-danger text-sm">
         Failed to load tasks: {(error as Error).message}
       </div>
     )
@@ -39,16 +30,7 @@ export function TaskList({ tenant }: Props) {
 
   if (!tasks || tasks.length === 0) {
     return (
-      <div
-        style={{
-          textAlign: 'center',
-          padding: '48px 0',
-          color: 'var(--color-text-muted)',
-          fontSize: '14px',
-          border: '1px dashed var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-        }}
-      >
+      <div className="text-center py-12 text-muted text-sm border border-dashed border-border rounded-lg">
         No tasks yet — add one above.
       </div>
     )
@@ -58,25 +40,17 @@ export function TaskList({ tenant }: Props) {
   const done = tasks.filter((t) => t.status === 'done')
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div className="flex flex-col gap-2">
       {/* Pending tasks first */}
       {pending.map((task) => (
         <TaskItem key={task.id} task={task} tenant={tenant} />
       ))}
+
       {/* Completed tasks below */}
       {done.length > 0 && (
         <>
           {pending.length > 0 && (
-            <div
-              style={{
-                margin: '8px 0 4px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: 'var(--color-text-muted)',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-              }}
-            >
+            <div className="mt-2 mb-1 text-[11px] font-semibold text-muted tracking-[0.06em] uppercase">
               Completed
             </div>
           )}

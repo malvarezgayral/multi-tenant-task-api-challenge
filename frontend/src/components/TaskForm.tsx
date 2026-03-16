@@ -16,7 +16,6 @@ export function TaskForm({ tenant }: Props) {
     onSuccess: () => {
       setTitle('')
       setError(null)
-      // Invalidate tasks for this tenant — TanStack Query re-fetches automatically
       void queryClient.invalidateQueries({ queryKey: ['tasks', tenant] })
     },
     onError: (err: Error) => {
@@ -32,18 +31,8 @@ export function TaskForm({ tenant }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '28px' }}>
-      <div
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '20px 24px',
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center',
-        }}
-      >
+    <form onSubmit={handleSubmit} className="mb-7">
+      <div className="bg-surface border border-border rounded-lg p-5 flex gap-3 items-center">
         <input
           type="text"
           value={title}
@@ -51,61 +40,29 @@ export function TaskForm({ tenant }: Props) {
           placeholder="New task title…"
           disabled={mutation.isPending}
           maxLength={500}
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            backgroundColor: 'var(--color-surface-elevated)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            color: 'var(--color-text-primary)',
-            fontSize: '14px',
-            outline: 'none',
-            transition: 'border-color 0.15s ease',
-          }}
-          onFocus={(e) => (e.target.style.borderColor = 'var(--color-accent)')}
-          onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+          className={[
+            'flex-1 px-3.5 py-2.5 rounded-md text-sm outline-none transition-colors duration-150',
+            'bg-surface-elevated border border-border text-primary placeholder:text-muted',
+            'focus:border-accent',
+            'disabled:opacity-60 disabled:cursor-not-allowed',
+          ].join(' ')}
         />
         <button
           type="submit"
           disabled={mutation.isPending || !title.trim()}
-          style={{
-            padding: '10px 22px',
-            backgroundColor: mutation.isPending ? 'var(--color-surface-elevated)' : 'var(--color-accent)',
-            color: mutation.isPending ? 'var(--color-text-muted)' : '#fff',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 600,
-            fontSize: '14px',
-            cursor: mutation.isPending ? 'not-allowed' : 'pointer',
-            transition: 'background-color 0.15s ease',
-            whiteSpace: 'nowrap',
-          }}
-          onMouseEnter={(e) => {
-            if (!mutation.isPending)
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                'var(--color-accent-hover)'
-          }}
-          onMouseLeave={(e) => {
-            if (!mutation.isPending)
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                'var(--color-accent)'
-          }}
+          className={[
+            'px-[22px] py-2.5 rounded-md font-semibold text-sm whitespace-nowrap',
+            'transition-colors duration-150 cursor-pointer',
+            'bg-accent hover:bg-accent-hover text-white',
+            'disabled:bg-surface-elevated disabled:text-muted disabled:cursor-not-allowed disabled:pointer-events-none',
+          ].join(' ')}
         >
           {mutation.isPending ? 'Adding…' : '+ Add task'}
         </button>
       </div>
 
       {error && (
-        <p
-          style={{
-            marginTop: '8px',
-            marginLeft: '4px',
-            fontSize: '13px',
-            color: 'var(--color-danger)',
-          }}
-        >
-          {error}
-        </p>
+        <p className="mt-2 ml-1 text-sm text-danger">{error}</p>
       )}
     </form>
   )
